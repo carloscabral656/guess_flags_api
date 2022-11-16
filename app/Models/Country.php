@@ -15,4 +15,14 @@ class Country extends Model
     protected $fillable = [
         'name'
     ];
+
+    //Rules for insert in Country
+    public $rulesInsert = [
+        'name' => 'required'
+    ];
+
+    //Message's for insert in Country
+    public $messagesValidated = [
+        'name.required' => 'Name is required'
+    ];
 }

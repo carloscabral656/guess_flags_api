@@ -3,9 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use \App\Models\Country as CountryModel;
+use \Illuminate\Support\Facades\Validator;
 
 class Country extends Controller
 {
+
+    public function __construct(CountryModel $countryModel)
+    {
+        $this->model = $countryModel;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -13,7 +21,7 @@ class Country extends Controller
      */
     public function index(Request $request)
     {
-        return \App\Models\Country::all();
+        return response()->json(\App\Models\Country::all());
     }
 
     /**
@@ -34,8 +42,21 @@ class Country extends Controller
      */
     public function store(Request $request)
     {
-        //
+        //Data's request
+        $data = $request->all();
 
+        //Country validation
+        $validated = Validator::make($data, $this->model->rulesInsert, $this->model->messagesValidated);
+
+        //If the validation fail
+        if($validated->fails()){
+            return response()->json($validated->messages());
+        }
+
+        //New Country
+        $country = $this->model->create($request->all());
+
+        return $country;
     }
 
     /**
