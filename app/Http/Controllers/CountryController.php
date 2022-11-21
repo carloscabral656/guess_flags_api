@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Responses\FailResponse;
+use App\Http\Responses\SuccessResponse;
+use App\Http\Service\CountryServiceConcrete;
 use Illuminate\Http\Request;
 use \App\Models\Country as CountryModel;
 use \Illuminate\Support\Facades\Validator;
 
-class Country extends Controller
+class CountryController extends Controller
 {
 
-    public function __construct(CountryModel $countryModel)
+    public function __construct(CountryServiceConcrete $service)
     {
-        $this->model = $countryModel;
+        $this->service = $service;
     }
 
     /**
@@ -21,7 +24,7 @@ class Country extends Controller
      */
     public function index(Request $request)
     {
-        return response()->json(\App\Models\Country::all());
+        return response()->json($this->service->getAll());
     }
 
     /**
@@ -46,7 +49,7 @@ class Country extends Controller
         $data = $request->all();
 
         //Country validation
-        $validated = Validator::make($data, $this->model->rulesInsert, $this->model->messagesValidated);
+        $validated = Validator::make($data, $this->service->model->rulesInsert, $this->service->model->messagesValidated);
 
         //If the validation fail
         if($validated->fails()){
@@ -54,7 +57,7 @@ class Country extends Controller
         }
 
         //New Country
-        $country = $this->model->create($request->all());
+        $country = $this->service->create($request->all());
 
         return $country;
     }
@@ -67,7 +70,12 @@ class Country extends Controller
      */
     public function show($id)
     {
-        //
+        try{
+            $country = $this->service->get($id);
+            return response()->json($country);
+        }catch(\SQLiteException $e){
+            return response()->json($e);
+        }
     }
 
     /**
@@ -90,7 +98,8 @@ class Country extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $country = $this->model->find($id);
+        return $country;
     }
 
     /**
@@ -101,6 +110,32 @@ class Country extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            $country = $this->service->get($id);
+            if(is_null($country)) {
+                return (
+                    new FailResponse(
+                        "Country doesn't exist.",
+                        200,
+                        "Country doesn't exist.",
+                        "",
+                        "",
+                        "")
+                )->getResponse();
+            }
+
+            $deleted = $this->service->delete($country);
+            if ($deleted) {
+                return (
+                    new SuccessResponse("Country deleted.", 200)
+                )->getResponse();
+            }
+
+            return (
+                new SuccessResponse("Country doesn't exist.", 200)
+            )->getResponse();
+        }catch (\Exception $e){
+            return (new FailResponse($e->getMessage(), 200))->getResponse();
+        }
     }
 }

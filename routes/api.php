@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 
-Route::resource('countries', \App\Http\Controllers\Country::class);
+Route::resource('countries', \App\Http\Controllers\CountryController::class);
 
 
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
