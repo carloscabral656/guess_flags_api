@@ -58,7 +58,8 @@ class CountryController extends Controller
                     "SQL Problem.",
                     "",
                     "",
-                    "")
+                    ""
+                )
             )->getResponse();
         }
 
@@ -73,7 +74,8 @@ class CountryController extends Controller
                     "SQL Problem.",
                     "",
                     "",
-                    "")
+                    ""
+                )
             )->getResponse();
         }
     }
@@ -140,8 +142,9 @@ class CountryController extends Controller
                     "SQL Problem.",
                     "",
                     "",
-                    "")
-                )->getResponse();
+                    ""
+                )
+            )->getResponse();
         }
 
         try {
@@ -155,7 +158,8 @@ class CountryController extends Controller
                     "SQL Problem.",
                     "",
                     "",
-                    "")
+                    ""
+                )
             )->getResponse();
         }
     }
@@ -178,7 +182,8 @@ class CountryController extends Controller
                         "Country doesn't exist.",
                         "",
                         "",
-                        "")
+                        ""
+                    )
                 )->getResponse();
             }
             $deleted = $this->service->delete($country);
@@ -188,10 +193,26 @@ class CountryController extends Controller
                 )->getResponse();
             }
             return (
-                new SuccessResponse("Country doesn't exist.", 200)
+                new FailResponse(
+                    200,
+                    "",
+                    "SQL Problem.",
+                    "",
+                    "",
+                    ""
+                )
             )->getResponse();
         }catch (\Exception $e){
-            return (new FailResponse($e->getMessage(), 200))->getResponse();
+            return (
+                new FailResponse(
+                    200,
+                    $e->getMessage(),
+                    "SQL Problem.",
+                    "",
+                    "",
+                    ""
+                )
+            )->getResponse();;
         }
     }
 }
