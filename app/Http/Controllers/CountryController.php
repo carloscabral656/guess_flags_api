@@ -11,11 +11,11 @@ use \Illuminate\Support\Facades\Validator;
 class CountryController extends Controller
 {
 
+    private $service;
 
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * Creates an instance of the class, the construct must have a service.
+     * @param \App\Http\Service\ServiceFactory
      */
     public function __construct(CountryServiceConcrete $service)
     {
@@ -25,24 +25,15 @@ class CountryController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \App\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
         return (
             new SuccessResponse($this->service->getAll(), 200)
         )->getResponse();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -60,11 +51,18 @@ class CountryController extends Controller
 
         //If the validation fail
         if($validated->fails()){
-            return response()->json($validated->messages());
+            return (
+                new FailResponse(
+                    200,
+                    $validated->messages(),
+                    "SQL Problem.",
+                    "",
+                    "",
+                    "")
+            )->getResponse();
         }
 
         try {
-            //New Country
             $country = $this->service->create($request->all());
             return $country;
         }catch(\Exception $e){
@@ -90,7 +88,9 @@ class CountryController extends Controller
     {
         try{
             $country = $this->service->get($id);
-            return response()->json($country);
+            return (
+                new SuccessResponse($country, 200)
+            )->getResponse();
         }catch(\Exception $e){
             return (
                 new FailResponse(
@@ -99,7 +99,8 @@ class CountryController extends Controller
                     "SQL Problem.",
                     "",
                     "",
-                    "")
+                    ""
+                )
             )->getResponse();
         }
     }
@@ -172,22 +173,20 @@ class CountryController extends Controller
             if(is_null($country)) {
                 return (
                     new FailResponse(
-                        "Country doesn't exist.",
                         200,
+                        "Country doesn't exist.",
                         "Country doesn't exist.",
                         "",
                         "",
                         "")
                 )->getResponse();
             }
-
             $deleted = $this->service->delete($country);
             if ($deleted) {
                 return (
                     new SuccessResponse("Country deleted.", 200)
                 )->getResponse();
             }
-
             return (
                 new SuccessResponse("Country doesn't exist.", 200)
             )->getResponse();

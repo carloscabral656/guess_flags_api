@@ -22,8 +22,8 @@ abstract class Response
 
     //Construct parent's class
     public function __construct($content, $status){
-        $this->status   = $status;
         $this->content  = $content;
+        $this->status   = $status;
         $this->response = new JsonResponse();
     }
 
