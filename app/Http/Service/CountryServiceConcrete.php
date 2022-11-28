@@ -15,7 +15,7 @@ class CountryServiceConcrete extends ServiceFactory
 {
 
     public function __construct(Country $country){
-        //Providing the mother's constructor with the specific model.
+        //Providing the parent's constructor with the specific model.
         parent::__construct($country);
     }
 }

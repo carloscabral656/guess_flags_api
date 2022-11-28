@@ -21,8 +21,18 @@ class Country extends Model
         'name' => 'required'
     ];
 
+    //Rules for insert in Country
+    public $rulesUpdate = [
+        'name' => 'required'
+    ];
+
     //Message's for insert in Country
-    public $messagesValidated = [
+    public $messagesValidatedInsert = [
+        'name.required' => 'Name is required'
+    ];
+
+    //Message's for insert in Country
+    public $messagesValidatedUpdate = [
         'name.required' => 'Name is required'
     ];
 }

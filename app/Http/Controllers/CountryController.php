@@ -6,12 +6,17 @@ use App\Http\Responses\FailResponse;
 use App\Http\Responses\SuccessResponse;
 use App\Http\Service\CountryServiceConcrete;
 use Illuminate\Http\Request;
-use \App\Models\Country as CountryModel;
 use \Illuminate\Support\Facades\Validator;
 
 class CountryController extends Controller
 {
 
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function __construct(CountryServiceConcrete $service)
     {
         $this->service = $service;
@@ -24,7 +29,9 @@ class CountryController extends Controller
      */
     public function index(Request $request)
     {
-        return response()->json($this->service->getAll());
+        return (
+            new SuccessResponse($this->service->getAll(), 200)
+        )->getResponse();
     }
 
     /**
@@ -49,17 +56,28 @@ class CountryController extends Controller
         $data = $request->all();
 
         //Country validation
-        $validated = Validator::make($data, $this->service->model->rulesInsert, $this->service->model->messagesValidated);
+        $validated = Validator::make($data, $this->service->model->rulesInsert, $this->service->model->messagesValidatedInsert);
 
         //If the validation fail
         if($validated->fails()){
             return response()->json($validated->messages());
         }
 
-        //New Country
-        $country = $this->service->create($request->all());
-
-        return $country;
+        try {
+            //New Country
+            $country = $this->service->create($request->all());
+            return $country;
+        }catch(\Exception $e){
+            return (
+                new FailResponse(
+                    "SQL Problem.",
+                    200,
+                    "SQL Problem.",
+                    "",
+                    "",
+                    "")
+            )->getResponse();
+        }
     }
 
     /**
@@ -73,8 +91,16 @@ class CountryController extends Controller
         try{
             $country = $this->service->get($id);
             return response()->json($country);
-        }catch(\SQLiteException $e){
-            return response()->json($e);
+        }catch(\Exception $e){
+            return (
+                new FailResponse(
+                    200,
+                    $e->getMessage(),
+                    "SQL Problem.",
+                    "",
+                    "",
+                    "")
+            )->getResponse();
         }
     }
 
@@ -98,8 +124,39 @@ class CountryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $country = $this->model->find($id);
-        return $country;
+        //Data's request
+        $data = $request->all();
+
+        //Country validation
+        $validated = Validator::make($data, $this->service->model->rulesUpdate, $this->service->model->messagesValidatedUpdate);
+
+        //If the validation fail
+        if($validated->fails()){
+            return (
+                new FailResponse(
+                    200,
+                    $validated->messages(),
+                    "SQL Problem.",
+                    "",
+                    "",
+                    "")
+                )->getResponse();
+        }
+
+        try {
+            //Update the specific country
+            return $this->service->update($id, $data);
+        }catch(\Exception $e){
+            return (
+                new FailResponse(
+                    200,
+                    $e->getMessage(),
+                    "SQL Problem.",
+                    "",
+                    "",
+                    "")
+            )->getResponse();
+        }
     }
 
     /**

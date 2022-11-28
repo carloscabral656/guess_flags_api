@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Model;
 class ServiceFactory
 {
 
+    public $model;
+
     public function __construct(Model $model){
         $this->model = $model;
     }
@@ -21,7 +23,7 @@ class ServiceFactory
     public function getAll(){
         try{
             return $this->model->all();
-        }catch(\SQLiteException $e){
+        }catch(\Exception $e){
             throw $e;
         }
     }
@@ -29,7 +31,7 @@ class ServiceFactory
     public function get($id){
         try{
             return $this->model->find($id);
-        }catch(\SQLiteException $e){
+        }catch(\Exception $e){
             throw $e;
         }
     }
@@ -42,14 +44,20 @@ class ServiceFactory
         }
     }
 
-    public function update($data){
-
+    public function update($id, $data){
+        try{
+            $resource = $this->get($id);
+            $deleted = $resource->update($data);
+            return $deleted;
+        }catch(\Exception $e){
+            throw $e;
+        }
     }
 
     public function delete($data){
         try{
             return $data->delete();
-        }catch(\SQLiteException $e){
+        }catch(\Exception $e){
             throw $e;
         }
     }

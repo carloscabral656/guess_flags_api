@@ -20,7 +20,7 @@ class FailResponse extends Response
 
     public function __construct($status, $content, $title, $detail, $type, $instance)
     {
-        parent::__construct($status, $content);
+        parent::__construct($content, $status);
         $this->title    = $title;
         $this->detail   = $detail;
         $this->type     = $type;
