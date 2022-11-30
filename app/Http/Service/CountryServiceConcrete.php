@@ -18,4 +18,19 @@ class CountryServiceConcrete extends ServiceFactory
         //Providing the parent's constructor with the specific model.
         parent::__construct($country);
     }
+
+
+    /**
+
+     */
+    public function getTotalCountrys(){ return $this->service->getAll()->count();}
+
+    /**
+
+     */
+    public function getRandomCountry(){
+        $randomCountry = rand(0, $this->getTotalCountrys()-1);
+        return $this->get($randomCountry);
+    }
+
 }

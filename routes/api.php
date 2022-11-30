@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::resource('countries', \App\Http\Controllers\CountryController::class);
-Route::get('question', Quest);
+Route::get('get-question', [\App\Http\Controllers\QuestionController::class, 'getQuestion']);
 
 
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
